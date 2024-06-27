@@ -11,10 +11,34 @@ const canvas = document.querySelector('canvas.webgl')
 
 //Scence
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87CEEB); // Black color
+
+const loader = new THREE.TextureLoader();
+const texture = loader.load('./background.jpg', () => {
+    scene.background = texture;
+});
+
+
+// Gradient texture
+const canvasTexture = document.createElement('canvas');
+canvasTexture.width = 256;
+canvasTexture.height = 256;
+const context = canvasTexture.getContext('2d');
+const gradient = context.createLinearGradient(0, 0, 256, 256);
+gradient.addColorStop(0, 'skyblue');
+gradient.addColorStop(1, 'blue');
+
+context.fillStyle = gradient;
+context.fillRect(0, 0, 256, 256);
+
+const gradientTexture = new THREE.CanvasTexture(canvasTexture);
+
 
 //Mesh
 const cubeGeometry = new THREE.BoxGeometry(1,1,1);
-const cubeMaterial = new THREE.MeshBasicMaterial({color:"red"});
+// const cubeMaterial = new THREE.MeshBasicMaterial({color:"red"});
+const cubeMaterial = new THREE.MeshStandardMaterial({ map: gradientTexture });
+
 // cubeMaterial.color = "red";
 const cubeMesh = new THREE.Mesh(
     cubeGeometry,
@@ -23,6 +47,13 @@ const cubeMesh = new THREE.Mesh(
 
 scene.add(cubeMesh);
 
+// Lights
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+scene.add(ambientLight);
+
+const pointLight = new THREE.PointLight(0xffffff, 0.1);
+pointLight.position.set(5, 5, 5);
+scene.add(pointLight);
 
 
 //camera
@@ -62,6 +93,10 @@ const renderLoop = () => {
 
     const elapsedTime = clock.getElapsedTime();
     let time = currentTime / elapsedTime;
+
+    cubeMesh.rotation.x = elapsedTime;
+    cubeMesh.rotation.y = elapsedTime;
+
 
     window.requestAnimationFrame(renderLoop)
     renderer.render(scene,camera)
