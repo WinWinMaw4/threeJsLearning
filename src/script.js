@@ -18,6 +18,18 @@ const texture = loader.load('./background.jpg', () => {
     scene.background = texture;
 });
 
+// const loader = new THREE.CubeTextureLoader();
+// const texture = loader.load([
+//     './background.jpg', // Right face
+//     './background.jpg', // Left face
+//     './background.jpg', // Top face
+//     './background.jpg', // Bottom face
+//     './background.jpg', // Front face
+//     './background.jpg'  // Back face
+// ]);
+
+scene.background = texture;
+
 
 // Gradient texture
 const canvasTexture = document.createElement('canvas');
@@ -25,8 +37,11 @@ canvasTexture.width = 256;
 canvasTexture.height = 256;
 const context = canvasTexture.getContext('2d');
 const gradient = context.createLinearGradient(0, 0, 256, 256);
+
+// Add multiple color stops
 gradient.addColorStop(0, 'skyblue');
-gradient.addColorStop(1, 'blue');
+gradient.addColorStop(0.5, 'green');
+gradient.addColorStop(1, 'skyblue');
 
 context.fillStyle = gradient;
 context.fillRect(0, 0, 256, 256);
@@ -40,9 +55,22 @@ const cubeGeometry = new THREE.BoxGeometry(1,1,1);
 const cubeMaterial = new THREE.MeshStandardMaterial({ map: gradientTexture });
 
 // cubeMaterial.color = "red";
+// Glass material
+const glassMaterial = new THREE.MeshPhysicalMaterial({
+    color: 'skyblue',
+    metalness: 0,
+    roughness: 0,
+    transmission: 1, // Transmission property makes the material transparent like glass
+    thickness: 0.5, // Thickness of the glass
+    envMap: gradientTexture, // Environment map for reflections
+    clearcoat: 1,
+    clearcoatRoughness: 0
+});
+
+
 const cubeMesh = new THREE.Mesh(
     cubeGeometry,
-    cubeMaterial
+    glassMaterial,
 );
 
 scene.add(cubeMesh);
